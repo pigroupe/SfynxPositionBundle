@@ -1,0 +1,45 @@
+{
+  "name": "sfynx-project/annotation-position-bundle",
+  "type": "symfony-bundle",
+  "description": "This Bundle provides annotations to manage position of entiy rows",
+  "keywords": ["annotations", "position"],
+  "homepage": "http://pigroupe.github.io/cmf-sfynx/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Etienne de Longeaux",
+      "email": "etienne.delongeaux@gmail.com"
+    },
+    {
+      "name": "Sfynx Community",
+      "homepage": "https://github.com/pigroupe/SfynxPositionBundle/contributors"
+    }
+  ],
+
+  "require": {
+    "symfony/framework-bundle": "~2.3"
+  },
+
+  "require-dev": {
+    "symfony/phpunit-bridge": "~2.7|~3.0",
+    "phpunit/phpunit": "*"
+  },
+
+  "suggest": {
+  },
+
+  "conflict": {
+  },
+
+  "autoload": {
+    "psr-0": { "Sfynx\\PositionBundle": "" }
+  },
+
+  "target-dir": "Sfynx/PositionBundle",
+
+  "extra": {
+    "branch-alias": {
+      "dev-master": "2.3-dev"
+    }
+  }
+}
