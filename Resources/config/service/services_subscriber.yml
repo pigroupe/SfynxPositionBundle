@@ -7,7 +7,7 @@ services:
     #         
     sfynx.annotation.subscriber.position:
         class: %sfynx.annotation.subscriber.position.class%
-        arguments: [@annotation_reader, @service_container]
+        arguments: ['@annotation_reader', '@service_container']
         properties:
             annotationclass: Sfynx\PositionBundle\Annotation\Positioned        
         tags:
