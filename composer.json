@@ -17,7 +17,9 @@
   ],
 
   "require": {
-    "symfony/framework-bundle": "~2.3"
+    "symfony/framework-bundle": "~2.8|~3.0",
+    "sfynx-project/tool-utils-bundle": "2.x-dev",
+    "sfynx-project/tool-trigger-bundle": "2.x-dev"
   },
 
   "require-dev": {
@@ -39,7 +41,7 @@
 
   "extra": {
     "branch-alias": {
-      "dev-master": "2.3-dev"
+      "dev-master": "2.x-dev"
     }
   }
 }
