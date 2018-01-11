@@ -174,8 +174,7 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
     public function preRemove(EventArgs $eventArgs)
     {
         $entity = $eventArgs->getEntity();
-        if ( !is_null($this->request)
-            && $this->tokenStorage->isUsernamePasswordToken()
+        if ( $this->tokenStorage->isUsernamePasswordToken()
             && method_exists($entity, 'setPosition')
             && method_exists($entity, 'getPosition')
             && $this->isChangePosition($eventArgs, 'POSITION_PREREMOVE')
@@ -204,8 +203,7 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
     public function prePersist(EventArgs $eventArgs)
     {
         $entity = $eventArgs->getEntity();
-        if ( !is_null($this->request)
-            && $this->tokenStorage->isUsernamePasswordToken()
+        if ($this->tokenStorage->isUsernamePasswordToken()
             && method_exists($entity, 'setPosition')
             && method_exists($entity, 'getPosition')
             && $this->isChangePosition($eventArgs, 'POSITION_PREPERSIST')
@@ -328,7 +326,9 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
         if (isset($GLOBALS['ENTITIES'][$type])
             && isset($GLOBALS['ENTITIES'][$type][$entity_name])
         ) {
-            if (is_array($GLOBALS['ENTITIES'][$type][$entity_name])) {
+            if (!is_null($this->request)
+                && is_array($GLOBALS['ENTITIES'][$type][$entity_name])
+            ) {
                 $route = $this->request->get('_route');
                 if ((empty($route) || ($route == "_internal"))) {
                     $route = $this->container->get('sfynx.tool.route.factory')->getMatchParamOfRoute('_route', $this->request->getLocale());
@@ -342,7 +342,8 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
         } else {
             foreach ($properties as $refProperty) {
 //                print_r($this->annReader->getPropertyAnnotations($refProperty));
-                if ($this->annReader->getPropertyAnnotation($refProperty, $this->annotationclass)) {
+                $classProperties = $this->annReader->getPropertyAnnotation($refProperty, $this->annotationclass);
+                if ($classProperties) {
                     // we have annotation and if it decrypt operation, we must avoid duble decryption
                     $propName = $refProperty->getName();
                     $methodName = PiStringManager::capitalize($propName);
@@ -351,14 +352,14 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
                     ) {
                         // we get the route name
                         $route = $this->request->get('_route');
-                        if ((empty($route) || ($route == "_internal"))) {
+                        if (!is_null($this->request)
+                            && (empty($route) || ($route == "_internal"))
+                        ) {
                             $route = $this->container->get('sfynx.tool.route.factory')->getMatchParamOfRoute('_route', $this->request->getLocale());
                         }
-                        //
-                        $properties = $this->annReader->getPropertyAnnotation($refProperty, $this->annotationclass);
-                        if (($properties->routes === true)
-                            || (is_array($properties->routes)
-                                && in_array($route, $properties->routes)
+                        if (($classProperties->routes === true)
+                            || (is_array($classProperties->routes)
+                                && in_array($route, $classProperties->routes)
                             )
                         ) {
                             $_is_change_position = true;
