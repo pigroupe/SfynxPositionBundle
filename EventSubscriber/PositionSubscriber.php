@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Sfynx\ToolBundle\Util\PiStringManager;
 use Sfynx\TriggerBundle\EventListener\abstractTriggerListener;
+use Sfynx\CoreBundle\Layers\Domain\Service\Request\Generalisation\RequestInterface;
 
 /**
  * Position Subscriber.
@@ -25,20 +26,11 @@ use Sfynx\TriggerBundle\EventListener\abstractTriggerListener;
  */
 class PositionSubscriber  extends abstractTriggerListener implements EventSubscriber
 {
-    /**
-     * Annotation reader
-     * @var \Doctrine\Common\Annotations\Reader
-     */
+    /** @var Reader */
     protected $annReader;
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
-
-    /**
-     * @var
-     */
+    /** @var RequestInterface */
     protected $request;
 
     /**
@@ -48,19 +40,20 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
     public $annotationclass = 'Sfynx\PositionBundle\Annotation\Positioned';
 
     /**
-     * Initialization of subscriber
-     *
-     * @param string $encryptorClass  The encryptor class.  This can be empty if
-     * a service is being provided.
-     * @param string $secretKey The secret key.
-     * @param EncryptorInterface|NULL $service (Optional)  An EncryptorInterface.
-     * This allows for the use of dependency injection for the encrypters.
+     * PositionSubscriber constructor.
+     * @param Reader $annReader
+     * @param RequestInterface $request
+     * @param ContainerInterface $container
      */
-    public function __construct(Reader $annReader, ContainerInterface $container) {
+    public function __construct(
+        Reader $annReader,
+        RequestInterface $request,
+        ContainerInterface $container
+    ) {
         parent::__construct($container);
-    	$this->annReader = $annReader;
-    	$this->container = $container;
-        $this->request   = $this->container->get('request_stack')->getCurrentRequest();
+        $this->annReader = $annReader;
+        $this->request   = $request;
+        $this->container = $container;
     }
 
     /**
@@ -118,7 +111,7 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
                 // if the position has not been given
                 if ((null === $new_position) || empty($new_position) || ($old_position <=0) ) {
                     // we select the max value of the table.
-                    $query_max     = "SELECT position FROM $entity_table mytable $sort_position_by_where ORDER BY mytable.position DESC LIMIT 1";
+                    $query_max     = "SELECT position FROM $entity_table mytable WHERE mytable.position IS NOT NULL $sort_position_by_and ORDER BY mytable.position DESC LIMIT 1";
                     $max         = $this->_connexion($eventArgs)->fetchColumn($query_max);
                     // we set the position value to max
                     $entity->setPosition($max+1);
@@ -228,11 +221,11 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
                 if (!isset($_GET['_subscriber_position_max'][ get_class($entity) ])
                     || empty($_GET['_subscriber_position_max'][ get_class($entity) ])
                 ) {
-                	// we select the max value of the table.
-                	$query_max = "SELECT position FROM $entity_table mytable $sort_position_by_where ORDER BY mytable.position DESC LIMIT 1";
-                	$new_max   = intVal($this->_connexion($eventArgs)->fetchColumn($query_max)) + 1;
+                    // we select the max value of the table.
+                    $query_max = "SELECT position FROM $entity_table mytable WHERE mytable.position IS NOT NULL $sort_position_by_and ORDER BY mytable.position DESC LIMIT 1";
+                    $new_max   = intVal($this->_connexion($eventArgs)->fetchColumn($query_max)) + 1;
                 } else {
-                	$new_max   = intVal($_GET['_subscriber_position_max'][ get_class($entity) ]) + 1;
+                    $new_max   = intVal($_GET['_subscriber_position_max'][ get_class($entity) ]) + 1;
                 }
                 // we set the position value.
                 $entity->setPosition($new_max);
@@ -283,7 +276,7 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
         $results['sort_position_by_and']   = " ";
         $results['sort_position_by_where'] = " ";
         //
-       	foreach ($properties as $refProperty) {
+        foreach ($properties as $refProperty) {
             if ($this->annReader->getPropertyAnnotation($refProperty, $this->annotationclass)) {
                 // we have annotation and if it decrypt operation, we must avoid duble decryption
                 $propName = $refProperty->getName();
@@ -311,7 +304,7 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
                     }
                 }
             }
-   	    }
+        }
 
         return $results;
     }
@@ -348,7 +341,7 @@ class PositionSubscriber  extends abstractTriggerListener implements EventSubscr
             }
         } else {
             foreach ($properties as $refProperty) {
-                //print_r($this->annReader->getPropertyAnnotations($refProperty));
+//                print_r($this->annReader->getPropertyAnnotations($refProperty));
                 if ($this->annReader->getPropertyAnnotation($refProperty, $this->annotationclass)) {
                     // we have annotation and if it decrypt operation, we must avoid duble decryption
                     $propName = $refProperty->getName();
