@@ -6,7 +6,8 @@ services:
     # configuration of the event subscriber of position
     #         
     sfynx.annotation.subscriber.position:
-        class: %sfynx.annotation.subscriber.position.class%
+        class: '%sfynx.annotation.subscriber.position.class%'
+        public: true
         arguments:
             - '@annotation_reader'
             - '@sfynx.core.request.strategy'
