@@ -18,9 +18,9 @@
 
   "require": {
     "symfony/framework-bundle": "~2.8|~3.0",
-    "sfynx-project/core-bundle": "2.x-dev",
     "sfynx-project/tool-utils-bundle": "~2.8.1",
     "sfynx-project/tool-trigger-bundle": "~2.8.1",
+    "sfynx-project/core-bundle": "~2.9.0"
   },
 
   "require-dev": {
